@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "impel",
+    "name": "Impel",
     "slug": "impel",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./logo.png",
     "scheme": "impel",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./logo.png"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +21,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./logo.png"
     },
     "plugins": [
       "expo-router",
