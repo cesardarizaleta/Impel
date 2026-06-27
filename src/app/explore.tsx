@@ -1,126 +1,62 @@
-import { Image } from 'expo-image';
-import { SymbolView } from 'expo-symbols';
-import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, ScrollView, Text, Pressable, Platform, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import { ExternalLink } from '@/components/external-link';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Collapsible } from '@/components/ui/collapsible';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { Spacing, BottomTabInset } from '@/constants/theme';
+import { ImpelLogo } from '@/components/logo';
 
 export default function TabTwoScreen() {
   const safeAreaInsets = useSafeAreaInsets();
+  const scheme = useColorScheme();
+  const isDark = scheme === 'dark';
+
   const insets = {
     ...safeAreaInsets,
     bottom: safeAreaInsets.bottom + BottomTabInset + Spacing.three,
   };
-  const theme = useTheme();
-
-  const contentPlatformStyle = Platform.select({
-    android: {
-      paddingTop: insets.top,
-      paddingLeft: insets.left,
-      paddingRight: insets.right,
-      paddingBottom: insets.bottom,
-    },
-    web: {
-      paddingTop: Spacing.six,
-      paddingBottom: Spacing.four,
-    },
-  });
 
   return (
     <ScrollView
-      style={[styles.scrollView, { backgroundColor: theme.background }]}
-      contentInset={insets}
-      contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}>
-      <ThemedView style={styles.container}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="subtitle">Explore</ThemedText>
-          <ThemedText style={styles.centerText} themeColor="textSecondary">
-            This starter app includes example{'\n'}code to help you get started.
-          </ThemedText>
+      style={styles.scrollView}
+      contentContainerStyle={[styles.contentContainer, { paddingTop: insets.top || 40, paddingBottom: insets.bottom }]}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.header}>
+        <ImpelLogo size={70} />
+        <Text style={styles.title}>Tecnología Impel</Text>
+        <Text style={styles.subtitle}>Bóveda Criptográfica Local-First</Text>
+      </View>
 
-          <ExternalLink href="https://docs.expo.dev" asChild>
-            <Pressable style={({ pressed }) => pressed && styles.pressed}>
-              <ThemedView type="backgroundElement" style={styles.linkButton}>
-                <ThemedText type="link">Expo documentation</ThemedText>
-                <SymbolView
-                  tintColor={theme.text}
-                  name={{ ios: 'arrow.up.right.square', android: 'link', web: 'link' }}
-                  size={12}
-                />
-              </ThemedView>
-            </Pressable>
-          </ExternalLink>
-        </ThemedView>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Cifrado Kozuki (AES-256-GCM)</Text>
+        <Text style={styles.paragraph}>
+          Toda la información guardada en tu dispositivo está protegida con algoritmos de cifrado simétrico avanzado. Impel implementa AES-GCM de 256 bits, garantizando que nadie —ni siquiera los creadores de la app— pueda acceder a tus contraseñas sin tu clave principal.
+        </Text>
+      </View>
 
-        <ThemedView style={styles.sectionsWrapper}>
-          <Collapsible title="File-based routing">
-            <ThemedText type="small">
-              This app has two screens: <ThemedText type="code">src/app/index.tsx</ThemedText> and{' '}
-              <ThemedText type="code">src/app/explore.tsx</ThemedText>
-            </ThemedText>
-            <ThemedText type="small">
-              The layout file in <ThemedText type="code">src/app/_layout.tsx</ThemedText> sets up
-              the tab navigator.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/router/introduction">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Filosofía Local-First</Text>
+        <Text style={styles.paragraph}>
+          Tus contraseñas pertenecen únicamente a tu dispositivo. No hay servidores centrales, bases de datos en la nube ni APIs de terceros que puedan ser vulneradas. La base de datos local SQLite cifrada es la "Prisión de Máxima Seguridad" de tus credenciales.
+        </Text>
+      </View>
 
-          <Collapsible title="Android, iOS, and web support">
-            <ThemedView type="backgroundElement" style={styles.collapsibleContent}>
-              <ThemedText type="small">
-                You can open this project on Android, iOS, and the web. To open the web version,
-                press <ThemedText type="smallBold">w</ThemedText> in the terminal running this
-                project.
-              </ThemedText>
-              <Image
-                source={require('@/assets/images/tutorial-web.png')}
-                style={styles.imageTutorial}
-              />
-            </ThemedView>
-          </Collapsible>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Integridad Biométrica</Text>
+        <Text style={styles.paragraph}>
+          Impel utiliza el hardware de enclave seguro (Secure Enclave en iOS y Keystore en Android) para verificar tu identidad a través de FaceID o huella dactilar, liberando la llave criptográfica únicamente en memoria RAM por tiempo limitado.
+        </Text>
+      </View>
 
-          <Collapsible title="Images">
-            <ThemedText type="small">
-              For static images, you can use the <ThemedText type="code">@2x</ThemedText> and{' '}
-              <ThemedText type="code">@3x</ThemedText> suffixes to provide files for different
-              screen densities.
-            </ThemedText>
-            <Image source={require('@/assets/images/react-logo.png')} style={styles.imageReact} />
-            <ExternalLink href="https://reactnative.dev/docs/images">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Desarrollado en React Native</Text>
+        <Text style={styles.paragraph}>
+          Construido con componentes nativos fluidos y animaciones optimizadas a 60fps usando React Native Reanimated para una experiencia visual de primer nivel en todas las plataformas.
+        </Text>
+      </View>
 
-          <Collapsible title="Light and dark mode components">
-            <ThemedText type="small">
-              This template has light and dark mode support. The{' '}
-              <ThemedText type="code">useColorScheme()</ThemedText> hook lets you inspect what the
-              user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Animations">
-            <ThemedText type="small">
-              This template includes an example of an animated component. The{' '}
-              <ThemedText type="code">src/components/ui/collapsible.tsx</ThemedText> component uses
-              the powerful <ThemedText type="code">react-native-reanimated</ThemedText> library to
-              animate opening this hint.
-            </ThemedText>
-          </Collapsible>
-        </ThemedView>
-        {Platform.OS === 'web' && <WebBadge />}
-      </ThemedView>
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>Impel Down Security Lab © 2026</Text>
+      </View>
     </ScrollView>
   );
 }
@@ -128,53 +64,55 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  container: {
-    maxWidth: MaxContentWidth,
-    flexGrow: 1,
-  },
-  titleContainer: {
-    gap: Spacing.three,
-    alignItems: 'center',
     paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.six,
+    paddingVertical: Spacing.four,
   },
-  centerText: {
-    textAlign: 'center',
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-  linkButton: {
-    flexDirection: 'row',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.five,
-    justifyContent: 'center',
-    gap: Spacing.one,
+  header: {
     alignItems: 'center',
-  },
-  sectionsWrapper: {
-    gap: Spacing.five,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.three,
-  },
-  collapsibleContent: {
-    alignItems: 'center',
-  },
-  imageTutorial: {
-    width: '100%',
-    aspectRatio: 296 / 171,
-    borderRadius: Spacing.three,
+    marginBottom: Spacing.five,
     marginTop: Spacing.two,
   },
-  imageReact: {
-    width: 100,
-    height: 100,
-    alignSelf: 'center',
+  title: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#000000',
+    marginTop: Spacing.three,
+  },
+  subtitle: {
+    fontSize: 12,
+    color: '#8E8E93',
+    fontWeight: '600',
+    marginTop: Spacing.one,
+  },
+  section: {
+    backgroundColor: '#F2F2F7',
+    borderRadius: 20,
+    padding: Spacing.three,
+    marginBottom: Spacing.three,
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#000000',
+    marginBottom: Spacing.one,
+  },
+  paragraph: {
+    fontSize: 12,
+    color: '#636366',
+    lineHeight: 18,
+    fontWeight: '500',
+  },
+  footer: {
+    alignItems: 'center',
+    marginTop: Spacing.four,
+    marginBottom: Spacing.two,
+  },
+  footerText: {
+    fontSize: 10,
+    color: '#AEAEB2',
+    fontWeight: '600',
   },
 });
