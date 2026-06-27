@@ -1,56 +1,132 @@
-# Welcome to your Expo app 👋
+<p align="center">
+  <img src="./assets/images/icon.png" alt="Impel Logo" width="120" />
+</p>
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<h1 align="center">Impel</h1>
 
-## Get started
+<p align="center">
+  <strong>Gestor de contraseñas seguro con autenticación biométrica</strong>
+</p>
 
-1. Install dependencies
+<p align="center">
+  <img src="https://img.shields.io/badge/React_Native-0.85-blue?logo=react" alt="React Native" />
+  <img src="https://img.shields.io/badge/Expo-SDK_56-black?logo=expo" alt="Expo SDK 56" />
+  <img src="https://img.shields.io/badge/TypeScript-6.0-blue?logo=typescript" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-green" alt="Platform" />
+</p>
 
-   ```bash
-   npm install
-   ```
+---
 
-2. Start the app
+## Acerca de
 
-   ```bash
-   npx expo start
-   ```
+**Impel** es un gestor de credenciales móvil y web construido con React Native y Expo. Protege tus cuentas con dos capas de autenticación biométrica (FaceID/TouchID), exportación cifrada con ZipCrypto, y auditorías de seguridad en tiempo real.
 
-In the output, you'll find options to open the app in a
+### Características principales
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- 🔐 **Doble biometría** — Sesión de 12 horas + desbloqueo de bóveda independiente con FaceID/TouchID
+- 🛡️ **Auditoría de seguridad** — Puntuación en tiempo real, detección de contraseñas filtradas y débiles
+- 📦 **Exportación cifrada** — Backup en archivo ZIP con cifrado ZipCrypto y clave aleatoria de alta entropía
+- 📥 **Importación inteligente** — Parser flexible que detecta plataforma, usuario, contraseña y campos personalizados
+- 🏷️ **Campos personalizados** — Almacena tokens 2FA, PINs, preguntas de seguridad y más por cuenta
+- 📱 **Multiplataforma** — iOS nativo, Android nativo y Web responsive con layout adaptativo
+- 🖥️ **Modo Desktop** — Showcase de 3 iPhones simulados lado a lado en pantallas grandes
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## Tech Stack
 
-When you're ready, run:
+| Capa | Tecnología |
+|------|-----------|
+| Framework | [Expo SDK 56](https://expo.dev) + [React Native 0.85](https://reactnative.dev) |
+| Lenguaje | TypeScript 6.0 |
+| Navegación | Expo Router (file-based) |
+| Animaciones | React Native Reanimated 4 |
+| Biometría | expo-local-authentication |
+| Almacenamiento | expo-file-system + expo-clipboard |
+| Compartir | expo-sharing |
+| Cifrado | ZipCrypto (implementación pura JS, sin dependencias nativas) |
+
+---
+
+## Inicio Rápido
+
+### Prerrequisitos
+
+- Node.js 18+
+- npm o yarn
+- [Expo CLI](https://docs.expo.dev/get-started/installation/)
+
+### Instalación
 
 ```bash
-npm run reset-project
+# Clonar el repositorio
+git clone https://github.com/cesardarizaleta/Impel.git
+cd Impel
+
+# Instalar dependencias
+npm install
+
+# Iniciar el servidor de desarrollo
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Ejecutar en plataformas
 
-### Other setup steps
+```bash
+# iOS (requiere macOS + Xcode)
+npm run ios
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+# Android (requiere Android Studio)
+npm run android
 
-## Learn more
+# Web
+npm run web
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+---
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Estructura del Proyecto
 
-## Join the community
+```
+src/
+├── app/                    # Rutas (Expo Router)
+│   ├── _layout.tsx         # Layout raíz
+│   ├── index.tsx           # Pantalla principal con lógica de layout
+│   └── explore.tsx         # Pantalla de exploración
+├── components/
+│   ├── screen-login.tsx    # Pantalla de login biométrico (sesión)
+│   ├── screen-unlock.tsx   # Pantalla de desbloqueo de bóveda
+│   ├── screen-vault.tsx    # Bóveda de credenciales
+│   ├── screen-audit.tsx    # Auditoría de seguridad
+│   ├── logo.tsx            # Logo generativo de Impel
+│   ├── iphone-frame.tsx    # Frame de iPhone para showcase web
+│   ├── poneglyph-bg.tsx    # Fondo decorativo
+│   └── icons.tsx           # Iconos SVG custom
+├── hooks/
+│   └── use-vault.tsx       # Estado global (contexto de la bóveda)
+└── constants/
+    └── theme.ts            # Tokens de diseño
+```
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Seguridad
+
+| Capa | Descripción |
+|------|-------------|
+| Sesión | Autenticación biométrica con expiración automática a las 12 horas |
+| Bóveda | Segundo factor biométrico independiente para acceder a credenciales |
+| Exportación | Archivo ZIP cifrado con ZipCrypto y clave de 20+ caracteres aleatorios |
+| Eliminación | Requiere confirmación biométrica antes de borrar cualquier credencial |
+
+---
+
+## Licencia
+
+Este proyecto está bajo la licencia incluida en el archivo [LICENSE](./LICENSE).
+
+---
+
+<p align="center">
+  Hecho con ☕ por <a href="https://github.com/cesardarizaleta">@cesardarizaleta</a>
+</p>
