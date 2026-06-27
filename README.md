@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/images/icon.png" alt="Impel Logo" width="120" />
+  <img src="./logo.png" alt="Impel" width="140" />
 </p>
 
 <h1 align="center">Impel</h1>
