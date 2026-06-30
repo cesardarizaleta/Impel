@@ -110,6 +110,39 @@ src/
 
 ---
 
+## Build & Deploy (EAS)
+
+El proyecto está configurado con **Expo Application Services (EAS)** para builds de producción:
+
+### Pre-requisitos
+1. Cuenta en [Expo.dev](https://expo.dev)
+2. Instalar EAS CLI: `npm install -g eas-cli` (ya incluido en devDependencies)
+3. Login: `eas login`
+
+### Comandos disponibles
+
+```bash
+# Instalar dependencias (incluye EAS CLI)
+npm install
+
+# Builds
+npm run eas:preview        # APK para testing interno
+npm run eas:production     # AAB para Play Store
+npm run eas:dev            # Build de desarrollo
+
+# Utilidades
+npm run eas:status         # Ver últimos builds
+npm run eas:submit         # Enviar build a Play Store
+
+# Configuración inicial (solo primera vez)
+eas build:configure        # Configurar proyecto en Expo
+```
+
+### Perfiles de Build
+- **preview**: APK para distribución interna (testing)
+- **production**: AAB (Android App Bundle) para Play Store
+- **development**: Build con desarrollo habilitado
+
 ## Seguridad
 
 | Capa | Descripción |
