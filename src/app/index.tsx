@@ -9,6 +9,7 @@ import { ScreenAudit } from '@/components/screen-audit';
 import { ScreenLogin } from '@/components/screen-login';
 import { Spacing } from '@/constants/theme';
 import { ImpelLogo } from '@/components/logo';
+import { LockIcon, ShieldIcon } from '@/components/icons';
 
 function MainAppContent() {
   const { width } = useWindowDimensions();
@@ -47,7 +48,7 @@ function MainAppContent() {
             <IPhoneFrame>
               <View style={{ flex: 1, backgroundColor: '#000000' }}>
                 <View style={styles.frostedLockOverlay}>
-                  <Text style={styles.overlayLockIcon}>🔒</Text>
+                  <LockIcon size={48} color="#FFFFFF" style={styles.overlayLockIcon} />
                   <Text style={styles.overlayLockTitle}>Sesión Cerrada</Text>
                   <Text style={styles.overlayLockSubtitle}>
                     Inicia sesión biométrica en el iPhone izquierdo para descifrar y activar las pantallas.
@@ -60,7 +61,7 @@ function MainAppContent() {
             <IPhoneFrame>
               <View style={{ flex: 1, backgroundColor: '#000000' }}>
                 <View style={styles.frostedLockOverlay}>
-                  <Text style={styles.overlayLockIcon}>🔒</Text>
+                  <LockIcon size={48} color="#FFFFFF" style={styles.overlayLockIcon} />
                   <Text style={styles.overlayLockTitle}>Sesión Cerrada</Text>
                   <Text style={styles.overlayLockSubtitle}>
                     Inicia sesión biométrica en el iPhone izquierdo para descifrar y activar las pantallas.
@@ -73,7 +74,7 @@ function MainAppContent() {
           {/* Desktop Footer Instructions */}
           <View style={styles.desktopFooter}>
             <Text style={styles.footerText}>
-              Impel Down utiliza dos niveles de biometría. Haz clic en "Desbloquear con Biometría" en el teléfono izquierdo para iniciar tu sesión de 12 horas.
+              Impel utiliza dos niveles de biometría. Haz clic en "Desbloquear con Biometría" en el teléfono izquierdo para iniciar tu sesión de 12 horas.
             </Text>
           </View>
         </View>
@@ -131,7 +132,7 @@ function MainAppContent() {
               {/* Frosted lock screen if locked */}
               {!isUnlocked && (
                 <View style={styles.frostedLockOverlay}>
-                  <Text style={styles.overlayLockIcon}>🔒</Text>
+                  <LockIcon size={48} color="#FFFFFF" style={styles.overlayLockIcon} />
                   <Text style={styles.overlayLockTitle}>Bóveda Bloqueada</Text>
                   <Text style={styles.overlayLockSubtitle}>
                     Autentícate en el panel principal (Teléfono Izquierdo) para ver tus credenciales.
@@ -148,7 +149,7 @@ function MainAppContent() {
               {/* Frosted lock screen if locked */}
               {!isUnlocked && (
                 <View style={styles.frostedLockOverlay}>
-                  <Text style={styles.overlayLockIcon}>🛡️</Text>
+                  <ShieldIcon size={48} color="#FFFFFF" style={styles.overlayLockIcon} />
                   <Text style={styles.overlayLockTitle}>Reporte Bloqueado</Text>
                   <Text style={styles.overlayLockSubtitle}>
                     El informe de auditoría se generará una vez descifrada la bóveda.
@@ -300,7 +301,6 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   overlayLockIcon: {
-    fontSize: 48,
     marginBottom: Spacing.three,
   },
   overlayLockTitle: {

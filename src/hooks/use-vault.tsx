@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import * as LocalAuthentication from 'expo-local-authentication';
+import { db } from '@/services/db';
 
 export type PasswordStrength = 'safe' | 'weak' | 'leaked';
 
@@ -8,15 +9,26 @@ export interface CustomField {
   value: string;
 }
 
+export interface Message {
+  id: string;
+  sender: 'bot' | 'user';
+  text: string;
+  timestamp: Date;
+  suggestions?: string[];
+  accountId?: string;
+}
+
 export interface Account {
   id: string;
   name: string;
   username: string;
+  password?: string;
   strength: PasswordStrength;
   logo: 'netflix' | 'google' | 'github' | 'spotify' | 'adobe' | 'epicgames' | 'generic';
   strengthText: string;
   isFavorite?: boolean;
   customFields?: CustomField[];
+  logoUrl?: string;
 }
 
 export interface AuditFinding {
@@ -53,15 +65,21 @@ interface VaultContextType {
     username: string,
     strength: PasswordStrength,
     strengthText: string,
-    customFields?: CustomField[]
+    customFields?: CustomField[],
+    password?: string
   ) => void;
   deleteAccount: (id: string) => void;
+  updateAccount: (account: Account) => Promise<void>;
   fixSingleAccount: (accountId: string) => void;
   isLoggedIn: boolean;
   loginTime: number | null;
   appLogin: () => Promise<boolean>;
   appLogout: () => void;
   setLoginTime: (time: number | null) => void;
+  chatMessages: Message[];
+  setChatMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  selectedDetailAccount: Account | null;
+  setSelectedDetailAccount: (account: Account | null) => void;
 }
 
 const VaultContext = createContext<VaultContextType | undefined>(undefined);
@@ -81,6 +99,65 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginTime, setLoginTime] = useState<number | null>(null);
+  const [chatMessages, setChatMessages] = useState<Message[]>([
+    {
+      id: 'welcome',
+      sender: 'bot',
+      text: '¡Hola! Soy tu asistente de Impel. ¿Qué credencial estás buscando hoy? Escribe el nombre de la plataforma (ej. "mercantil" o "netflix").',
+      timestamp: new Date(),
+      suggestions: ['netflix', 'google', 'spotify'],
+    },
+  ]);
+  const [selectedDetailAccount, setSelectedDetailAccount] = useState<Account | null>(null);
+
+  // Load persisted database data on mount
+  useEffect(() => {
+    const loadPersistedData = async () => {
+      try {
+        await db.init();
+        const loadedAccounts = await db.getAccounts();
+        setAccounts(loadedAccounts);
+
+        const loadedMessages = await db.getMessages();
+        if (loadedMessages.length === 0) {
+          const welcomeMsg: Message = {
+            id: 'welcome',
+            sender: 'bot',
+            text: '¡Hola! Soy tu asistente de Impel. ¿Qué credencial estás buscando hoy? Escribe el nombre de la plataforma (ej. "mercantil" o "netflix").',
+            timestamp: new Date(),
+            suggestions: ['netflix', 'google', 'spotify'],
+          };
+          await db.saveMessage(welcomeMsg);
+          setChatMessages([welcomeMsg]);
+        } else {
+          setChatMessages(loadedMessages);
+        }
+      } catch (error) {
+        console.error('Error loading database data:', error);
+      }
+    };
+
+    loadPersistedData();
+  }, []);
+
+  const setChatMessagesWrapper = (
+    value: React.SetStateAction<Message[]>
+  ) => {
+    setChatMessages((prev) => {
+      const nextMessages = typeof value === 'function' ? (value as any)(prev) : value;
+      if (nextMessages.length === 0) {
+        db.clearMessages();
+      } else {
+        const newMessages = nextMessages.filter(
+          (nextMsg: Message) => !prev.some((prevMsg) => prevMsg.id === nextMsg.id)
+        );
+        newMessages.forEach((msg: Message) => {
+          db.saveMessage(msg);
+        });
+      }
+      return nextMessages;
+    });
+  };
 
   // Background timer to invalidate the 12-hour session
   useEffect(() => {
@@ -110,7 +187,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
 
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Ingresar a Impel Down',
+        promptMessage: 'Ingresar a Impel',
         fallbackLabel: 'Usar contraseña del dispositivo',
         disableDeviceFallback: false,
       });
@@ -182,7 +259,14 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const toggleFavorite = (id: string) => {
     setAccounts((prev) =>
-      prev.map((acc) => (acc.id === id ? { ...acc, isFavorite: !acc.isFavorite } : acc))
+      prev.map((acc) => {
+        if (acc.id === id) {
+          const updated = { ...acc, isFavorite: !acc.isFavorite };
+          db.saveAccount(updated);
+          return updated;
+        }
+        return acc;
+      })
     );
   };
 
@@ -199,11 +283,13 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setAccounts((prev) =>
       prev.map((acc) => {
         if (finding.affectedAccounts.includes(acc.id)) {
-          return {
+          const updated = {
             ...acc,
             strength: 'safe' as PasswordStrength,
             strengthText: 'Segura',
           };
+          db.saveAccount(updated);
+          return updated;
         }
         return acc;
       })
@@ -215,11 +301,15 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setFindings((prev) => prev.map((f) => ({ ...f, isFixed: true })));
     setAccounts((prev) =>
-      prev.map((acc) => ({
-        ...acc,
-        strength: 'safe' as PasswordStrength,
-        strengthText: 'Segura',
-      }))
+      prev.map((acc) => {
+        const updated = {
+          ...acc,
+          strength: 'safe' as PasswordStrength,
+          strengthText: 'Segura',
+        };
+        db.saveAccount(updated);
+        return updated;
+      })
     );
   };
 
@@ -228,34 +318,107 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     username: string,
     strength: PasswordStrength,
     strengthText: string,
-    customFields?: CustomField[]
+    customFields?: CustomField[],
+    password?: string
   ) => {
-    const id = name.toLowerCase().trim().replace(/\s+/g, '');
+    // Generate a completely unique random ID
+    const id = Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+    const cleanName = name.trim();
+    const logoBase = cleanName.toLowerCase().replace(/\s+/g, '');
+
     const newAcc: Account = {
       id,
-      name,
+      name: cleanName,
       username,
+      password,
       strength,
       strengthText,
-      logo: (['netflix', 'google', 'github', 'spotify', 'adobe', 'epicgames'].includes(id)
-        ? id
+      logo: (['netflix', 'google', 'github', 'spotify', 'adobe', 'epicgames'].includes(logoBase)
+        ? logoBase
         : 'generic') as any,
       customFields,
     };
+    db.saveAccount(newAcc);
     setAccounts((prev) => [newAcc, ...prev]);
+
+    // Fetch the SVGL logo asynchronously in the background
+    (async () => {
+      try {
+        const response = await fetch(`https://api.svgl.app?search=${encodeURIComponent(logoBase)}`);
+        if (response.ok) {
+          const results = await response.json();
+          if (results && results.length > 0) {
+            // Find a perfect match or take the first match
+            const match = results.find(
+              (r: any) => r.title.toLowerCase() === cleanName.toLowerCase()
+            ) || results[0];
+            
+            let logoUrl: string | undefined = undefined;
+            if (typeof match.route === 'object' && match.route !== null) {
+              logoUrl = match.route.light || match.route.dark;
+            } else if (typeof match.route === 'string') {
+              logoUrl = match.route;
+            }
+
+            if (logoUrl) {
+              const updatedAcc = { ...newAcc, logoUrl };
+              await db.saveAccount(updatedAcc);
+              setAccounts((prev) =>
+                prev.map((acc) => (acc.id === id ? updatedAcc : acc))
+              );
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('SVGL logo fetch background error:', e);
+      }
+    })();
   };
 
   const deleteAccount = (id: string) => {
+    db.deleteAccount(id);
     setAccounts((prev) => prev.filter((acc) => acc.id !== id));
+  };
+
+  const updateAccount = async (updatedAcc: Account) => {
+    let strength: PasswordStrength = 'safe';
+    let strengthText = 'Segura';
+    if (updatedAcc.password !== undefined) {
+      if (updatedAcc.password.length < 8) {
+        strength = 'leaked';
+        strengthText = 'Filtrada';
+      } else if (updatedAcc.password.length < 12) {
+        strength = 'weak';
+        strengthText = 'Débil';
+      }
+    }
+
+    const finalAcc = {
+      ...updatedAcc,
+      strength,
+      strengthText,
+    };
+
+    await db.saveAccount(finalAcc);
+    setAccounts((prev) =>
+      prev.map((acc) => (acc.id === finalAcc.id ? finalAcc : acc))
+    );
+
+    if (selectedDetailAccount && selectedDetailAccount.id === finalAcc.id) {
+      setSelectedDetailAccount(finalAcc);
+    }
   };
 
   const fixSingleAccount = (accountId: string) => {
     setAccounts((prev) =>
-      prev.map((acc) =>
-        acc.id === accountId
-          ? { ...acc, strength: 'safe' as PasswordStrength, strengthText: 'Segura' }
-          : acc
-      )
+      prev.map((acc) => {
+        if (acc.id === accountId) {
+          const updated = { ...acc, strength: 'safe' as PasswordStrength, strengthText: 'Segura' };
+          db.saveAccount(updated);
+          return updated;
+        }
+        return acc;
+      })
     );
     // Automatically flag matching findings as fixed if all their affected accounts are safe
     setFindings((prev) =>
@@ -307,12 +470,17 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setIsAddOpen,
         addAccount,
         deleteAccount,
+        updateAccount,
         fixSingleAccount,
         isLoggedIn,
         loginTime,
         appLogin,
         appLogout,
         setLoginTime,
+        chatMessages,
+        setChatMessages: setChatMessagesWrapper,
+        selectedDetailAccount,
+        setSelectedDetailAccount,
       }}>
       {children}
     </VaultContext.Provider>

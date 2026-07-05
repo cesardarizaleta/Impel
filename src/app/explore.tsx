@@ -55,7 +55,7 @@ export default function TabTwoScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Impel Down Security Lab © 2026</Text>
+        <Text style={styles.footerText}>Impel Security Lab © 2026</Text>
       </View>
     </ScrollView>
   );
