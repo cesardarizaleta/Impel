@@ -7,17 +7,11 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "node": "22.13.0",
-      "install": {
-        "command": "npm install --legacy-peer-deps"
-      }
+      "node": "22.13.0"
     },
     "preview": {
       "distribution": "internal",
       "node": "22.13.0",
-      "install": {
-        "command": "npm install --legacy-peer-deps"
-      },
       "android": {
         "buildType": "apk"
       }
@@ -26,9 +20,6 @@
       "autoIncrement": true,
       "distribution": "store",
       "node": "22.13.0",
-      "install": {
-        "command": "npm install --legacy-peer-deps"
-      },
       "android": {
         "buildType": "app-bundle"
       }
